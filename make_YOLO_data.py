@@ -95,7 +95,7 @@ def from_label_np_to_bbox_txt(label_path, save_dir):
     save_path = os.path.join(save_dir, stem + ".txt")
 
     # save the dataframe as a txt file
-    df.to_csv(save_path, sep=" ", index=False, header=False)
+    df.to_csv(save_path, sep="\t", index=False, header=False)
 
 
 if __name__ == "__main__":
