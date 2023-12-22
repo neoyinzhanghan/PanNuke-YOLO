@@ -44,6 +44,93 @@ def get_separate_masks(label_path):
     return mask_list
 
 
+def get_contour_points_from_mask(mask):
+    """The mask is a 0 1 binary mask.
+    We want to extract a list of boundary points from the mask.
+    [(x1, y1), (x2, y2), ...] return a list of tuples.
+    """
+
+    # first convert the mask to uint8 ranging from 0 to 255
+    mask = mask.astype(np.uint8)
+    # change all 1 to 255
+    mask[mask != 0] = 255
+
+    # Find contours
+    contours, _ = cv2.findContours(mask, cv2.RETR_TREE, cv2.CHAIN_APPROX_SIMPLE)
+
+    # Simplify contours and normalize points (example for the first contour)
+    epsilon = 0.01 * cv2.arcLength(contours[0], True)
+    approx = cv2.approxPolyDP(contours[0], epsilon, True)
+
+    normalized_contour = [
+        (point[0][0] / mask.shape[1], point[0][1] / mask.shape[0]) for point in approx
+    ]
+
+    return normalized_contour
+
+
+def get_txt_line_from_contour_points(contour_points):
+    """Return a string where <class> is always 0
+    <class> <x1> <y1> ... <xn> <yn>
+    """
+    txt_line = "0"
+
+    for point in contour_points:
+        txt_line += " " + str(point[0]) + " " + str(point[1])
+
+    return txt_line
+
+
+def get_boundary_points_txt_from_label(label_path, save_dir):
+    """The label_path leads to a .npy file that contains the label of the image.
+    The label path is in the format of /path/to/label_2136.npy.
+    First get a list of masks from the the label.
+    Then for each mask, get a list of boundary points.
+    Fore each list of boundary points, convert it to a txt line.
+    Write each line as a row in a txt file to save in the save_dir.
+    The txt filename should be image_2136.txt.
+    """
+
+    mask_list = get_separate_masks(label_path)
+
+    # get the stem of the label_path
+    stem = Path(label_path).stem
+
+    # the image name is image_2136.png, we want to save it as label_2136.jpg
+    stem = stem.replace("label", "image")
+
+    # create the save path
+    save_path = os.path.join(save_dir, stem + ".txt")
+
+    # open the save path as a file
+    with open(save_path, "w") as f:
+        # for each mask, get a list of boundary points, then convert it to a txt line, then write it to the file
+        for mask in mask_list:
+            try:
+                # get a list of boundary points from the mask
+                contour_points = get_contour_points_from_mask(mask)
+
+                # convert the list of boundary points to a txt line
+                txt_line = get_txt_line_from_contour_points(contour_points)
+
+                # write the txt line to the file
+                f.write(txt_line + "\n")
+
+            except Exception as e:
+                print(e)
+                print("Error in mask: ", mask)
+                # print the dimension and the max min value of the mask
+                print("Dimension: ", mask.shape)
+                print("Max value: ", np.max(mask))
+                print("Min value: ", np.min(mask))
+                # display the mask, first convert to uint8 ranging from 0 to 255 (currently it is a 0 1 binary mask)
+                mask = mask.astype(np.uint8)
+                # change all 1 to 255
+                mask[mask != 0] = 255
+                cv2.imshow("mask", mask)
+                cv2.waitKey(0)
+
+
 def from_label_np_to_bbox_txt(label_path, save_dir):
     """The label_path leads to a .npy file that contains the label of the image.
     The label is a 256x256 binary mask with integer values.
@@ -99,15 +186,13 @@ def from_label_np_to_bbox_txt(label_path, save_dir):
 
 
 if __name__ == "__main__":
-    label_dir = "/Users/neo/Documents/Research/CP/pannuke/labels/masks/validation"
-    save_dir = "/Users/neo/Documents/Research/CP/pannuke/bboxes/masks/validation"
+    label_dir = "/home/alpaca/Documents/neo/pannuke_full/labels/test"
+    save_dir = "/home/alpaca/Documents/neo/pannuke_full/contours/test"
 
-    # if save_dir does not exist, create it
-    os.makedirs(save_dir, exist_ok=True)
+    # if the save_dir does not exist, create it
+    if not os.path.exists(save_dir):
+        os.makedirs(save_dir)
 
-    # traverse through all the .npy files in the label_dir
-    for label_path in tqdm(
-        Path(label_dir).glob("*.npy"), desc="Creating bbox txt files"
-    ):
-        # convert the label to bbox and save it as a txt file
-        from_label_np_to_bbox_txt(label_path, save_dir)
+    # traverse through all the label files in the label_dir
+    for label_path in tqdm(Path(label_dir).glob("*.npy"), desc="Getting contours"):
+        get_boundary_points_txt_from_label(label_path, save_dir)
