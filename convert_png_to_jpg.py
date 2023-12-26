@@ -3,7 +3,7 @@ import os
 from tqdm import tqdm
 from pathlib import Path
 
-dir_name = "/media/ssd1/pannuke/YOLO_data/test/images"
+dir_name = "/home/alpaca/Documents/neovision/pannuke_full/YOLO_seg_data/train/images"
 
 # traverse through all png files in the directory and resave them as jpg
 for file_name in tqdm(Path(dir_name).glob("*.png"), desc="Converting png to jpg"):

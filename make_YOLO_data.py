@@ -130,6 +130,11 @@ def get_boundary_points_txt_from_label(label_path, save_dir):
                 cv2.imshow("mask", mask)
                 cv2.waitKey(0)
 
+        # erase the last \n in the file
+        f.seek(0, os.SEEK_END)
+        f.seek(f.tell() - 1, os.SEEK_SET)
+        f.truncate()
+
 
 def from_label_np_to_bbox_txt(label_path, save_dir):
     """The label_path leads to a .npy file that contains the label of the image.
@@ -187,7 +192,7 @@ def from_label_np_to_bbox_txt(label_path, save_dir):
 
 if __name__ == "__main__":
     label_dir = "/home/alpaca/Documents/neo/pannuke_full/labels/validation"
-    save_dir = "/home/alpaca/Documents/neo/pannuke_full/contours/validation"
+    save_dir = "/home/alpaca/Documents/neo/pannuke_full/YOLO_seg_data/validation/labels"
 
     # if the save_dir does not exist, create it
     if not os.path.exists(save_dir):
