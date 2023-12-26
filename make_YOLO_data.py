@@ -105,7 +105,7 @@ def get_boundary_points_txt_from_label(label_path, save_dir):
     # open the save path as a file
     with open(save_path, "w") as f:
         # for each mask, get a list of boundary points, then convert it to a txt line, then write it to the file
-        for mask in mask_list:
+        for i, mask in enumerate(mask_list):
             try:
                 # get a list of boundary points from the mask
                 contour_points = get_contour_points_from_mask(mask)
@@ -113,8 +113,11 @@ def get_boundary_points_txt_from_label(label_path, save_dir):
                 # convert the list of boundary points to a txt line
                 txt_line = get_txt_line_from_contour_points(contour_points)
 
-                # write the txt line to the file
-                f.write(txt_line + "\n")
+                if i != len(mask_list) - 1:
+                    # write the txt line to the file
+                    f.write(txt_line + "\n")
+                else:
+                    f.write(txt_line)
 
             except Exception as e:
                 print(e)
@@ -129,11 +132,6 @@ def get_boundary_points_txt_from_label(label_path, save_dir):
                 mask[mask != 0] = 255
                 cv2.imshow("mask", mask)
                 cv2.waitKey(0)
-
-        # erase the last \n in the file
-        f.seek(0, os.SEEK_END)
-        f.seek(f.tell() - 1, os.SEEK_SET)
-        f.truncate()
 
 
 def from_label_np_to_bbox_txt(label_path, save_dir):
