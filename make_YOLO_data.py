@@ -189,8 +189,8 @@ def from_label_np_to_bbox_txt(label_path, save_dir):
 
 
 if __name__ == "__main__":
-    label_dir = "/home/alpaca/Documents/neo/pannuke_full/labels/test"
-    save_dir = "/home/alpaca/Documents/neo/pannuke_full/YOLO_seg_data/test/labels"
+    label_dir = "/home/alpaca/Documents/neo/pannuke_full/labels/train"
+    save_dir = "/home/alpaca/Documents/neo/pannuke_full/YOLO_seg_data/train/labels"
 
     # if the save_dir does not exist, create it
     if not os.path.exists(save_dir):
