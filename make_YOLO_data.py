@@ -125,6 +125,8 @@ def get_boundary_points_txt_from_label(label_path, save_dir):
 
             except Exception as e:
                 print(e)
+                # print the name of the label file
+                print("Label path: ", label_path)
                 print("Error in mask: ", mask)
                 # print the dimension and the max min value of the mask
                 print("Dimension: ", mask.shape)
