@@ -66,6 +66,10 @@ def get_contour_points_from_mask(mask):
         (point[0][0] / mask.shape[1], point[0][1] / mask.shape[0]) for point in approx
     ]
 
+    if len(normalized_contour) < 3:
+        # print the name of the label file
+        raise Exception("The contour has less than 3 points.")
+
     return normalized_contour
 
 
@@ -190,7 +194,7 @@ def from_label_np_to_bbox_txt(label_path, save_dir):
 
 if __name__ == "__main__":
     label_dir = "/home/alpaca/Documents/neo/pannuke_full/labels/train"
-    save_dir = "/home/alpaca/Documents/neo/pannuke_full/YOLO_seg_data/train/labels"
+    save_dir = "/home/alpaca/Documents/neo/pannuke_full/YOLO_seg_data/labels/train"
 
     # if the save_dir does not exist, create it
     if not os.path.exists(save_dir):
