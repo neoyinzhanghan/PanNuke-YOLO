@@ -59,7 +59,7 @@ def get_contour_points_from_mask(mask):
     contours, _ = cv2.findContours(mask, cv2.RETR_TREE, cv2.CHAIN_APPROX_SIMPLE)
 
     # Simplify contours and normalize points (example for the first contour)
-    epsilon = 0.01 * cv2.arcLength(contours[0], True)
+    epsilon = 0.005 * cv2.arcLength(contours[0], True)
     approx = cv2.approxPolyDP(contours[0], epsilon, True)
 
     normalized_contour = [
