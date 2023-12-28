@@ -208,9 +208,9 @@ class ContourError(ValueError):
 
 
 if __name__ == "__main__":
-    label_dir = "/home/alpaca/Documents/neo/pannuke_full/labels/train"
+    label_dir = "/home/alpaca/Documents/neo/pannuke_full/labels/test"
     # label_dir = "/Users/neo/Documents/Research/CP/pannuke_full/labels/train/"
-    save_dir = "/home/alpaca/Documents/neo/pannuke_full/YOLO_seg_data/labels/train"
+    save_dir = "/home/alpaca/Documents/neo/pannuke_full/YOLO_seg_data/labels/test"
     # save_dir = (
     #     "/Users/neo/Documents/Research/CP/pannuke_full/YOLO_seg_data/labels/train"
     # )
