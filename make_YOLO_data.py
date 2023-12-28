@@ -68,7 +68,7 @@ def get_contour_points_from_mask(mask):
 
     if len(normalized_contour) < 3:
         # print the name of the label file
-        raise Exception("The contour has less than 3 points.")
+        raise ContourError("The contour has less than 3 points.")
 
     return normalized_contour
 
@@ -85,7 +85,7 @@ def get_txt_line_from_contour_points(contour_points):
     return txt_line
 
 
-def get_boundary_points_txt_from_label(label_path, save_dir):
+def get_boundary_points_txt_from_label(label_path, save_dir, error_log_path=None):
     """The label_path leads to a .npy file that contains the label of the image.
     The label path is in the format of /path/to/label_2136.npy.
     First get a list of masks from the the label.
@@ -123,10 +123,8 @@ def get_boundary_points_txt_from_label(label_path, save_dir):
                 else:
                     f.write(txt_line)
 
-            except Exception as e:
-                print(e)
-                # print the name of the label file
-                print("Label path: ", label_path)
+            except ContourError:  # continue on error protocol
+                print("ContourError occured at: ", label_path)
                 print("Error in mask: ", mask)
                 # print the dimension and the max min value of the mask
                 print("Dimension: ", mask.shape)
@@ -136,8 +134,18 @@ def get_boundary_points_txt_from_label(label_path, save_dir):
                 mask = mask.astype(np.uint8)
                 # change all 1 to 255
                 mask[mask != 0] = 255
-                cv2.imshow("mask", mask)
-                cv2.waitKey(0)
+
+                # save the mask as an image in the error_log_path
+                if error_log_path is not None:
+                    # create the save path
+                    save_path = os.path.join(
+                        error_log_path, stem + "_mask_" + str(i) + ".jpg"
+                    )
+                    # save the image as jpg
+                    cv2.imwrite(save_path, mask)
+
+                # then continue to the next mask
+                continue
 
 
 def from_label_np_to_bbox_txt(label_path, save_dir):
@@ -194,9 +202,22 @@ def from_label_np_to_bbox_txt(label_path, save_dir):
     df.to_csv(save_path, sep="\t", index=False, header=False)
 
 
+class ContourError(ValueError):
+    def __init__(self, message):
+        self.message = message
+
+
 if __name__ == "__main__":
     label_dir = "/home/alpaca/Documents/neo/pannuke_full/labels/train"
+    # label_dir = "/Users/neo/Documents/Research/CP/pannuke_full/labels/train/"
     save_dir = "/home/alpaca/Documents/neo/pannuke_full/YOLO_seg_data/labels/train"
+    # save_dir = (
+    #     "/Users/neo/Documents/Research/CP/pannuke_full/YOLO_seg_data/labels/train"
+    # )
+    # error_log_path = "/Users/neo/Documents/Research/CP/pannuke_full/error_log"
+    error_log_path = "/home/alpaca/Documents/neo/pannuke_full/error_log"
+    os.makedirs(save_dir, exist_ok=True)
+    os.makedirs(error_log_path, exist_ok=True)
 
     # if the save_dir does not exist, create it
     if not os.path.exists(save_dir):
@@ -204,4 +225,6 @@ if __name__ == "__main__":
 
     # traverse through all the label files in the label_dir
     for label_path in tqdm(Path(label_dir).glob("*.npy"), desc="Getting contours"):
-        get_boundary_points_txt_from_label(label_path, save_dir)
+        get_boundary_points_txt_from_label(
+            label_path, save_dir, error_log_path=error_log_path
+        )

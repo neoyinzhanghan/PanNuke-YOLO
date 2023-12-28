@@ -3,11 +3,11 @@ import cv2
 
 annotation_path = "/Users/neo/Documents/Research/CP/pannuke/annotations/masks/prediction/annotations/annotation_2136.npy"
 image_path = (
-    "/Users/neo/Documents/Research/CP/pannuke/images/masks/prediction/image_2136.png"
+    "/Users/neo/Documents/Research/CP/pannuke/images/masks/prediction/image_0887.png"
 )
 centroid_path = "/Users/neo/Documents/Research/CP/pannuke/annotations/masks/prediction/centroids/centroids_2136.npy"
 label_path = (
-    "/Users/neo/Documents/Research/CP/pannuke/labels/masks/prediction/label_2136.npy"
+    "/Users/neo/Documents/Research/CP/pannuke/labels/masks/prediction/label_0887.npy"
 )
 
 # open and display the image in image_path
